@@ -17,7 +17,7 @@ string DataManager::CreateDirData(const string& file_path) {
       filesystem::create_directory(target_dir);
     }
     return target_dir.string();
-  } catch (const filesystem::filesystem_error& e) {
+  } catch (const filesystem::filesystem_error&) {
     return "";
   }
 };
@@ -35,12 +35,20 @@ size_t DataManager::CalcRecordBytes() {
   return total_bytes;
 };
 
-DataManager::DataManager(const size_t& file_space = 20,
-                         const string& file_path = "../data") {
-  file_path_ = CreateDirData(file_path);
-  file_space_ = file_space;
+DataManager::DataManager(const string& file_path) {
+  file_path_ = file_path;
+  file_space_ = 20;
   data_counter_ = CalcRecordBytes();
 };
+
+DataManager* DataManager::CreateDataManager(const string& file_path) {
+  string file_dir = CreateDirData(file_path);
+  if (file_dir.size() == 0) {
+    return nullptr;
+  }
+
+  return new DataManager(file_dir);
+}
 
 size_t DataManager::WriteToFile(const uint8_t* p_data, size_t p_size,
                                 const string& file_name) {
@@ -62,8 +70,8 @@ size_t DataManager::Set(const uint8_t* p_data, size_t p_size) {
 
   while (written_bytes < p_size) {
     size_t space_file = file_space_ - (data_counter_ % file_space_);
-    int num_file = data_counter_ / file_space_ + 1;
-    string file_name = std::to_string(num_file) + ".bin";
+    size_t num_file = data_counter_ / file_space_ + 1;
+    string file_name = file_path_ + std::to_string(num_file) + ".bin";
     size_t num_bytes = std::min(p_size - written_bytes, space_file);
 
     size_t result_write =
@@ -93,8 +101,8 @@ vector<uint8_t> DataManager::ReadFromFile(const string& filename,
   return data;
 }
 
-std::vector<uint8_t>& DataManager::Get(size_t p_offset, size_t p_size,
-                                       const uint8_t* p_result) {
+size_t DataManager::Get(size_t p_offset, size_t p_size,
+                        vector<uint8_t>& p_result) {
   if (p_offset >= data_counter_ || p_offset + p_size > data_counter_) {
     return {};
   }
@@ -104,17 +112,19 @@ std::vector<uint8_t>& DataManager::Get(size_t p_offset, size_t p_size,
 
   while (read_bytes_num < p_size) {
     size_t current_offset = p_offset + read_bytes_num;
-    int num_file = current_offset / file_space_ + 1;
-    string file_name = std::to_string(num_file) + ".bin";
+    size_t num_file = current_offset / file_space_ + 1;
+    string file_name = file_path_ + std::to_string(num_file) + ".bin";
     size_t num_bytes = std::min(p_size - read_bytes_num,
                                 file_space_ - current_offset % file_space_);
 
     vector<uint8_t> read_bytes =
         ReadFromFile(file_name, current_offset % 20, num_bytes);
 
-    result.insert(result.end(), read_bytes.begin(), read_bytes.end());
+    p_result.insert(p_result.end(), read_bytes.begin(), read_bytes.end());
     read_bytes_num += read_bytes.size();
   }
 
-  return result;
+  return p_result.size();
 };
+
+size_t DataManager::GetDataCounter() { return data_counter_; }

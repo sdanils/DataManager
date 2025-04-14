@@ -13,38 +13,47 @@ using std::vector;
 class DataManager {
  private:
   /**
-   * @brief Содержит число записанных байт
+   * @brief Содержит число записанных байт.
    */
   size_t data_counter_;
   /**
-   * @brief Содержит размер файлов
+   * @brief Содержит размер файлов.
    */
   size_t file_space_;
   /**
-   * @brief Дериктория для файлов
+   * @brief Дериктория для файлов.
+   * @details В формате ../../{name}/
    */
   string file_path_;
 
-  string CreateDirData(const string& file_path);
   /**
-   * @brief Записывает данные меньше 20 байт в указанный фаил
+   * @brief Создаёт дерикторию для файлов.
+   */
+  static string CreateDirData(const string& file_path);
+  /**
+   * @brief Записывает данные меньше 20 байт в указанный фаил.
    */
   size_t WriteToFile(const uint8_t* p_data, size_t p_size,
                      const string& file_name);
+  /**
+   * Вычисляет количесвто записанных байт в дерикторию объекта.
+   */
   size_t CalcRecordBytes();
   /**
-   * @brief Читает данные меньше 20 байт из указанного фаила
+   * @brief Читает данные меньше 20 байт из указанного фаила.
    */
   vector<uint8_t> ReadFromFile(const string& filename, size_t p_offset,
                                size_t count);
 
+  DataManager(const string& file_path);
+
  public:
   /**
-   * @param file_path Строка с адресом хранения файлов с данными.
-   * @param file_space Размер файлов хранения.
+   * @brief Фабричный метод для создания объектов класса.
+   * @details Нужен для проверки корректности переданной дериктивы.
    */
-  DataManager(const size_t& file_space = 20,
-              const string& file_path = "../data");
+  static DataManager* CreateDataManager(
+      const string& file_path = "../../data/");
   /**
    * @brief Записывает данные из массива p_data в файлы.
    * @param p_data Указатель на массив данных.
@@ -58,6 +67,9 @@ class DataManager {
    * @param p_size Число элементов для чтения.
    * @return Вектор элементов.
    */
-  std::vector<uint8_t>& Get(size_t p_offset, size_t p_size,
-                            const uint8_t* p_result);
+  size_t Get(size_t p_offset, size_t p_size, vector<uint8_t>& p_result);
+  /**
+   * @brief Возвращает число записанных в дерективу байтов.
+   */
+  size_t GetDataCounter();
 };
