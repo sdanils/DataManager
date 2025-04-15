@@ -26,7 +26,7 @@ string coutM(string masseg) {
 }
 
 int main() {
-  string answer = coutM("Change the file directories (../../data/)? Y/n: ");
+  string answer = coutM("Change the file directories (../data/)? Y/n: ");
   string file_dir = "../data/";
   if (answer.size() == 1 && answer[0] == 'Y') {
     file_dir = coutM("Enter new directory: ");

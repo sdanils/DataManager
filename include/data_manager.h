@@ -31,7 +31,7 @@ class DataManager {
    */
   static string CreateDirData(const string& file_path);
   /**
-   * @brief Записывает данные меньше 20 байт в указанный фаил.
+   * @brief Записывает данные меньше 21 байт в указанный фаил.
    */
   size_t WriteToFile(const uint8_t* p_data, size_t p_size,
                      const string& file_name);
@@ -40,7 +40,7 @@ class DataManager {
    */
   size_t CalcRecordBytes();
   /**
-   * @brief Читает данные меньше 20 байт из указанного фаила.
+   * @brief Читает данные меньше 21 байт из указанного фаила.
    */
   vector<uint8_t> ReadFromFile(const string& filename, size_t p_offset,
                                size_t count);
@@ -50,7 +50,7 @@ class DataManager {
  public:
   /**
    * @brief Фабричный метод для создания объектов класса.
-   * @details Нужен для проверки корректности переданной дериктивы.
+   * @details Нужен для проверки корректности переданной директивы.
    */
   static DataManager* CreateDataManager(
       const string& file_path = "../../data/");
@@ -65,7 +65,8 @@ class DataManager {
    * @brief Читает данные из файлов в вектор.
    * @param p_offset Смещение начала интервала данных.
    * @param p_size Число элементов для чтения.
-   * @return Вектор элементов.
+   * @param p_result Вектор для записи данных.
+   * @return Число прочитанных элементов.
    */
   size_t Get(size_t p_offset, size_t p_size, vector<uint8_t>& p_result);
   /**
